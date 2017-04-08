@@ -31,21 +31,30 @@ I did NOT choose the following ones:
 
 * Number of user IDs, that is, number of users who enroll in the free trial. The reason I did not choose this as an invariant is that we would actually expect this metric to vary if the warning message about required hours of week is effective. 
 
+* Click-through probability: this is practically the ratio of the number of unique cookies to click and the number of unique cookies to view the course page, both of which are already set as invariant metrics. Therefore, it is redundant to measure click-through probability. 
+
 **Evaluation metrics**
 
-I chose the following ones:
+I chose the following metrics: 
+
+* Gross conversion: this metric should decrease significantly to justify launching the change. 
+* Retention: this metric should increase significantly to justify launching the change. 
+* Net conversion: this metric should NOT decrease significantly to justify launching the change. A decrease in this metric would indicate potential loss of revenues. 
+
+Practical significance levels for the above three metrics have been set at 0.01, 0.01 and 0.0075, respectively. 
+
+Below is a more in-depth discussion on these metrics and their expected behavior. 
 
 * Gross conversion: it makes perfect sense to measure the number of user IDs to complete checkout and enroll in the free trial divided by unique cookies to click the “Start free trial” button. The time commitment warning message is supposed to make a person think twice about time commitment before enrolling. Thus, a certain number of people, who are not sure they can commit sufficient time, would conceivably decide not to enroll. Therefore, one would expect gross conversion to be lower in the experiment group compared to the control group. 
 * Retention: if the warning message is effective and only the people who are well-informed about required time commitment and are prepared to give this time commitment enroll in the course, the probability of their paying through the 14-day period will be higher. Hence, retention, measured as the number of user IDs to remain enrolled past the 14-day boundary divided by the number of user IDs to complete the checkout is expected to increase in the experiment group. 
 * Net conversion: this is the number of user IDs to remain enrolled past the 14-day boundary divided by the number of unique cookies to click the “Start free trial” button. Interestingly, this measure can be decomposed as follows: (Pay/Enroll) x (Enroll/Click). This effectively means that Net Conversion is a product of Gross Conversion and Retention. As we expect Gross Conversion to go down, while Retention to go up, the two effects may offset each other and Net Conversion may not change. However, it will be interesting to verify this and I decided to include as an evaluation metric. 
 
-I did NOT choose the following ones:
-
-* Click-through probability: I did not include this as an evaluation metric, as the objective of this experiment is not about the probability of a page viewer’s clicking the “Start free trial” button. Rather, the study is concerned with the process after one clicks the “Start free trial” button. 
 
 ### Measuring Standard Deviation
 
-Given the baseline values (first tab in the Excel file), I calculated analytic estimates of the standard deviations of the evaluation metrics, given the sample size of 5,000 cookies visiting the course overview page. I believe analytic estimates would approximate empirical estimates well, as (i) we are dealing with probability metrics, hence it is reasonable to assume a binomial distribution and (ii) we have a large number of instances, which should make binomial distribution close to normal. The only metric where we may want to check the standard deviation empirically is retention, as in this case the total number of instances (82 enrollments on the basis of 5,000 page visits) is rather low. 
+Given the baseline values (first tab in the Excel file), I calculated analytic estimates of the standard deviations of the evaluation metrics, given the sample size of 5,000 cookies visiting the course overview page. I believe analytic estimates would approximate empirical estimates well, as (i) we are dealing with probability metrics, hence it is reasonable to assume a binomial distribution and (ii) we have a large number of instances, which should make binomial distribution close to normal. Additionally, to make a judgement about the adequacy of analytic estimates, I check if the unit of analysis and unit of diversion are the same for the metrics. For gross and net conversions, the unit of analysis is "clicks", defined as the number of **unique cookies** to click the "Start free trial" button. As the unit of diversion is cookies, the unit of analysis and unit of diversion do coincide. For retention, the unit of analysis is user ID. We know that after enrollment, user ID becomes the unit of diversion. Therefore, the unit of analysis and unit of diversion do coincide in this case as well. 
+
+Based on the above reasoning, I conclude that the analytic estimates of standard deviations should be good approximations of the real underlying values. 
 
 * Gross conversion    SD = 0.0202 
 * Retention           SD = 0.0549
@@ -55,15 +64,13 @@ Given the baseline values (first tab in the Excel file), I calculated analytic e
 
 **Number of Samples vs. Power**
 
-Given the baseline values and the alpha and beta values of 0.05 and 0.2, respectively, I used the [online calculator](http://www.evanmiller.org/ab-testing/sample-size.html) to estimate the required number of pageviews for each of the three metrics. Based on the highest one, I concluded that 4,740,000 pageviews will be required (later to be split between control and experiment) to power the experiment appropriately. 
-
-I will not use Bonferroni correction because the metrics are inter-related and Bonferroni may lead to overly conservative conclusions. 
+Given the baseline values and the alpha and beta values of 0.05 and 0.2, respectively, I used the [online calculator](http://www.evanmiller.org/ab-testing/sample-size.html) to estimate the required number of pageviews for each of the three metrics. Based on the highest value associated with the three metrics, a total of 4,740,000 pageviews will be required to power the experiment appropriately. Even if we route the entire traffic through the experiment, this is equivalent to 119 days, which is prohibitively long. This duration is driven by the retention metric. The other two metrics, gross and net conversion, require durations multiples lower. Therefore, I recommend dropping Retention altogether. I believe a sound business decision can be made on the basis of the gross and net conversion metrics only. These require 646K and 686K pageviews, respectively. Based on the higher number, the experiment will only require 18 days, if the entire traffic is routed through it. 
 
 **Duration vs. Exposure**
 
-I would direct 100% of my traffic through this experiment, as I don’t see the risk exposure to be very high by incorporating the message clarifying the required time commitment. 
+I don’t see this experiment carrying a high risk exposure. The inclusion of the message clarifying the required time commitment (i) cannot really cause any harm to anybody, (ii) does not involve any data privacy or confidentiality issues and (iii) it is difficult to imagine that it will cause any significant frustration to prospective users and thus damage the brand somehow. 
 
-On this basis, it will take 119 days to run the experiment. 
+On this basis, I recommend taking 100% of the traffic through the experiment, which will then take 18 days to complete. 
 
 
 ## Experiment Analysis
@@ -79,10 +86,9 @@ For my invariant metrics, below are the 95% confidence interval for the value I 
 
 **Effect Size Tests**
 
-Below are the effect size tests and corresponding conclusions for each of the three evaluation metrics. As expected, Gross Conversion decreased and Retention increased. The former is both statistically and practically significant, while the latter – only statistically significant. Net conversion is not significant at all. As suspected, the opposite effects of Gross Conversion and Retention seem to have offset each other. As explained in a previous section, I did not use Bonferroni correction. 
+Below are the effect size tests and corresponding conclusions for each of the evaluation metrics. As expected, Gross Conversion decreased. The change is both statistically and practically significant. The change in net conversion is not significant at all. 
 
 * Gross conversion: -0.0291 to -0.0120, both statistically and practically significant 
-* Retention: 0.0081 to 0.0541, statistically but NOT practically significant 
 * Net conversion: -0.0116 to 0.0019, NEITHER statistically NOR practically significant 
 
 **Sign Tests**
@@ -90,16 +96,29 @@ Below are the effect size tests and corresponding conclusions for each of the th
 I additionally performed sign tests, the results of which are below. 
 
 * Gross conversion: 0.0026, statistically significant  
-* Retention: 0.6776, NOT statistically significant
 * Net conversion: 0.6776, NOT statistically significant 
 
-There is a discrepancy between the effect size test and sign test in the case of Retention: effect size is significant, while sign test – is not. We can find an explanation if we look at the daily differences. The magnitudes of daily positive differences are consistently higher than the negative ones. The effect size captures magnitudes, while the sign test does not. 
+As we can see, the sign tests bear out the effect size tests.  
 
- 
+I did not use Bonferroni correction in my analysis, as we are dealing with a situation where multiple (two, in our case) metrics have to meet our criteria **at the same time** for us to launch the change. As we know, Bonferroni correction uses significantly reduced statistical significance levels and is hence very conservative. This increases the chance of rejection of one of the multiple metrics, which will in turn mean the rejection of the entire proposal. In other words, the probability of Type II error goes up. Bonferroni correction is more appropriate in situations where we have multiple metrics and when the confirmation of **any** of them is sufficient for the launch. In this setting, it is justified to be conservative to reduce the probability f Type I error. 
+
+
 ### Recommendation
 
-Given the fact that Gross Conversion is practically significant, I recommend launching the change. The meaningful reduction in Gross Conversion means that there will be fewer frustrated students, which is good for the brand. The potential reduction of revenue due to the lower gross conversion is offset by the increase in retention. The fact that there is no significant change in Net Conversion proves that overall revenues should not suffer due to this change. Therefore, the effect of this change can be summarized as “increased student satisfaction without any loss of revenue”. To me, this makes a compelling case for launching the change. 
+The analysis of the results shows that:
+
+* Gross conversion did decrease in a practically significant manner, which meets the launch decision criterion set out at the beginning. 
+* Net conversion did NOT decrease in a statistically significant manner, which also meets our launch decision criterion. 
+
+Based on the above, I recommend launching the change. The meaningful reduction in Gross Conversion means that there will be fewer frustrated students, which is good for the brand. The fact that there is no significant change in Net Conversion proves that overall revenues should not suffer due to this change. Therefore, the effect of this change can be summarized as “increased student satisfaction without any loss of revenue”. To me, this makes a convincing case for launching the change. 
+
+As a caveat, it should be noted that the lower confidence level boundary of the change in net conversion (-0.0116) lies below the practical significance level of -0.0075. This indicates certain probability (c. 30%) that net conversion may have actually decreased beyond the practical significance level. Therefore, while the test outcome does meet the launch criteria and the change can be launched, if the business wants to obtain an even higher confidence, an additional experiment can be carried out with a higher test power. 
+
 
 ## Follow-Up Experiment
 
-To do even more towards increasing the student's chances of success, I would introduce a basic prerequisite skills test prior to enrollment. This would allow the student to get an objective assessment of their skills and gauge even better their chances of completing the course successfully. I would keep all the invariant and evaluation metrics the same as in the previous experiment but would not divert the entire traffic through the experiment, as before. I believe the risk exposure here is higher, as such test would be somewhat cumbersome and may put a significant number of applicants off. 
+To do even more towards increasing the student's chances of success, I would introduce a basic prerequisite skills test prior to enrollment. The hypothesis is that this will allow the student to get an objective assessment of their skills and gauge even better their chances of completing the course successfully. The experiment will follow the same lines as the one described above. If the student clicks "start free trial", they will be asked to take the skills test. If the student passes the test, they will be taken through the checkout process as usual. Otherwise, a message will appear suggesting they upgrade their skills (e.g. basic python coding, prob and stats knowledge, etc.) and come back, or suggesting that the student might like to access the course materials for free. At this point, the student will have the option to continue enrolling in the free trial, or access the course materials or leave and come back later. 
+
+The unit of diversion will be a cookie and after enrollment - user ID. Invariant metrics will be the same - the number of cookies to view the page and number of clicks on "Start free trial" button. Evaluation metrics will be gross and net conversion, as defined in previous experiment. 
+
+This experiment does not carry any risk in terms of bringing potential harm to the student, nor does in involve any data privacy and confidentiality issues. However, the proposed test can be somewhat cumbersome and there is a risk that prospective students may find it off-putting. Therefore, I propose not to take the entire traffic through the experiment but rather, only 50%. This will still allow completing the experiment in about 5 weeks. 
